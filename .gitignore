@@ -1,0 +1,15 @@
+# Compiled output
+out/
+bin/
+*.class
+
+# IDE settings
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
