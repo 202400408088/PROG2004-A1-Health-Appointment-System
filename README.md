@@ -32,7 +32,8 @@ java -cp out AssignmentOne
 
 | Class | Responsibility | Part |
 |---|---|---|
-| `HealthProfessional` (abstract) | Shared state and behaviour for every professional: numeric ID, name, fixed weekly working days. Declares the abstract operations every subtype must supply. | 1 |
+| `HealthProfessional` (abstract) | Shared state and behaviour for every professional: numeric ID, name, fixed weekly working days, department. Declares the abstract operations every subtype must supply. | 1 |
+| `Department` | A clinic department: unique code, readable name, building location. Immutable; two departments are equal when their codes match. | extension |
 | `GeneralPractitioner` | Consulting room, new-patient status, `prescribeMedication(...)`. | 2 |
 | `Cardiologist` | Sub-specialty, reporting lab, `requestElectrocardiogram(...)`. | 2 |
 | `Surgeon` | Surgical field, theatre, `scheduleProcedure(...)`. | 2 |
@@ -41,7 +42,8 @@ java -cp out AssignmentOne
 | `Patient` | Patient name and validated mobile number. | 4 |
 | `Appointment` | Links one `Patient`, one `HealthProfessional` and one `LocalTime`; implements `Comparable<Appointment>`. | 4 |
 | `ClinicSchedule` | The fixed daily timetable (08:00–16:00, 30-minute slots), generated from its own configuration. | 5 |
-| `AppointmentManager` | Owns the `ArrayList` of appointments and offers add / view / filter / sort / cancel, each returning a readable message. | 5 |
+| `AppointmentManager` | Owns the `ArrayList` of appointments and offers add / view / filter (professional ID, patient mobile, department) / sort / cancel (ID + time, mobile, department), each returning a readable message. | 5 |
+| `DepartmentDirectory` | The register of departments: rejects a duplicate code, looks departments up by code, and groups the professionals of one department. | extension |
 | `AssignmentOne` | `main` method: the scripted end-to-end demonstration. | 3, 4, 5, 6 |
 
 Relationship summary:
@@ -180,6 +182,41 @@ outside the timetable, a rejected null appointment, two different filter argumen
 cancellation by professional and time, a cancellation by phone, and three cancellations that
 must fail. The final listing proves the collection changed.
 
+### Departments — grouping the professionals
+
+The clinic's staff are organised into departments (`GENP`, `CARD`, `SURG`, `DIET`, `NURS`).
+
+**Why a class and not a `String` or an `enum`.** A department has three things a string cannot
+guarantee: a code that must be unique, a readable name, and a physical location in the building.
+`Department` validates all three on construction, so a department that exists is always a usable
+one. An `enum` was rejected because the set of departments is data, not a fixed language constant:
+adding Oncology must not require recompiling the program, and `DepartmentDirectory.addDepartment(...)`
+does exactly that at runtime. A plain string field was rejected because it carries no validation and
+no identity — two different spellings of the same department would silently become two departments.
+
+**One department per professional.** `HealthProfessional` holds a single `Department` reference.
+A professional belongs to one place in the organisation chart, and the ward / theatre / consulting
+room fields in the subclasses continue to describe the *physical* place inside that department
+(for example Nursing → Ward B), so the two levels of detail do not overlap.
+
+**Two constructors, old signatures unchanged.** Every subtype gained an extra constructor that
+takes a `Department`, while its original constructors delegate to it with the sensible default
+(`Department.cardiology()` for a cardiologist, and so on). The ten objects created in Part 3 still
+compile unchanged, and no caller has to know about departments to keep working.
+
+**Department is deliberately excluded from `equals`.** `HealthProfessional.equals` compares the
+numeric ID only. Moving a doctor from one department to another does not turn them into a different
+person, and an appointment booked before the move must still be found by
+`findByProfessional(...)` afterwards. `Department.equals` compares the code alone, which is what
+lets the directory refuse a duplicate registration.
+
+**Operations added.** `DepartmentDirectory` keeps the register, rejects a duplicate code with a
+`WARNING` message, and groups professionals by department (`findProfessionalsByDepartment(...)`).
+`AppointmentManager.findByDepartment(code)` filters a day's appointments by department, and
+`cancelByDepartment(code)` removes every booking belonging to one department (for example when a
+department closes for the afternoon), returning `OK` with the number removed or a `WARNING` when
+nothing matched. The demonstration shows both, plus a `WARNING` for an unknown department code.
+
 ---
 
 ## 4. Assumptions
@@ -201,7 +238,7 @@ must fail. The final listing proves the collection changed.
 
 | Pillar | Where it lives | What to say |
 |---|---|---|
-| **Encapsulation** | `HealthProfessional` fields are `private final`, validated in the constructor, exposed only through getters that copy the list; `Nurse.bloodSamplesCollected` can only change through `takeBloodSample`; `AppointmentManager` keeps its `ArrayList` private and hands back sorted copies. | The object’s state can only be changed through methods that enforce its rules, so no caller can put an object into an invalid state. |
+| **Encapsulation** | `HealthProfessional` fields are `private final`, validated in the constructor, exposed only through getters that copy the list; `Department` is immutable and validates its own code, name and location; `Nurse.bloodSamplesCollected` can only change through `takeBloodSample`; `AppointmentManager` and `DepartmentDirectory` keep their collections private and hand back copies. | The object’s state can only be changed through methods that enforce its rules, so no caller can put an object into an invalid state. |
 | **Inheritance** | `GeneralPractitioner`, `Cardiologist`, `Surgeon`, `Dietitian`, `Nurse` all `extends HealthProfessional` and call `super(...)`. | The shared ID, name and working days, and their validation, are written once; each subtype adds only what is new. |
 | **Polymorphism** | `List<HealthProfessional>` printed in one loop; `performPrimaryDuty()` and `toString()` overridden in every subtype; `Appointment` holds a `HealthProfessional` reference. | The same call produces five different results depending on the real object, and new types need no change in the calling code. |
 | **Abstraction** | `HealthProfessional` is `abstract` with three abstract methods; `ClinicSchedule` hides slot generation behind `isValidSlot` / `getSlots`; `AppointmentManager` hides storage and searching behind add / find / cancel. | Callers deal with “what a professional does”, not “which class it is”; the compiler forbids a professional with no specialty. |

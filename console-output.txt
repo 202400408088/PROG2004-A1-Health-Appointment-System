@@ -1,0 +1,284 @@
+========================================================================
+ PROG2004 Object Oriented Programming - Assessment 1
+ Health Service Appointment System
+ Demonstration run for 2026-11-16
+========================================================================
+
+------------------------------------------------------------------------
+ PART 3 - WORKING WITH HEALTH PROFESSIONAL OBJECTS
+------------------------------------------------------------------------
+
+ 10 health professionals were created from five different classes.
+ They are stored in one List<HealthProfessional>, so every type is
+ handled together through the same base type.
+
+ Full details of every professional:
+   (1) General Practitioner 1001 - Dr Anna Nguyen
+       Department   : GENP - General Practice (Level 1, Clinic A)
+       Working days : Mon, Wed, Fri
+       Consulting room: Room 3 | Accepting new patients: yes
+       Primary duty : Consults with patients, diagnoses common conditions and prescribes medication.
+
+   (2) General Practitioner 1002 - Dr Ben Carter
+       Department   : GENP - General Practice (Level 1, Clinic A)
+       Working days : Mon, Tue, Wed, Thu
+       Consulting room: Room 5 | Accepting new patients: no
+       Primary duty : Consults with patients, diagnoses common conditions and prescribes medication.
+
+   (3) General Practitioner 1003 - Dr Priya Sharma
+       Department   : GENP - General Practice (Level 1, Clinic A)
+       Working days : Mon, Tue, Wed, Thu, Fri
+       Consulting room: Room 8 | Accepting new patients: yes
+       Primary duty : Consults with patients, diagnoses common conditions and prescribes medication.
+
+   (4) Cardiologist (Specialist) 2001 - Dr Helen Marsh
+       Department   : CARD - Cardiology (Level 3, Cardiac Suite)
+       Working days : Mon, Wed
+       Sub-specialty: Interventional cardiology | Reports from: Cardiac Laboratory 1
+       Primary duty : Assesses heart conditions, orders cardiac tests and reviews specialist referrals.
+
+   (5) Cardiologist (Specialist) 2002 - Dr Omar Haddad
+       Department   : CARD - Cardiology (Level 3, Cardiac Suite)
+       Working days : Tue, Fri
+       Sub-specialty: Electrophysiology | Reports from: Cardiac Laboratory 2
+       Primary duty : Assesses heart conditions, orders cardiac tests and reviews specialist referrals.
+
+   (6) Surgeon (Specialist) 3001 - Dr Lucas Reid
+       Department   : SURG - Surgery (Level 4, Theatres)
+       Working days : Wed, Fri
+       Surgical field: Orthopaedic surgery | Operating theatre: Theatre 2
+       Primary duty : Performs surgical procedures and manages patients before and after an operation.
+
+   (7) Dietitian 4001 - Ms Mei Tan
+       Department   : DIET - Nutrition and Dietetics (Level 2, Clinic C)
+       Working days : Mon, Tue, Thu
+       Diet focus: Type 2 diabetes and weight management | Years practising: 9
+       Primary duty : Assesses nutritional needs and prepares meal plans for patients.
+
+   (8) Dietitian 4002 - Mr Daniel Brooks
+       Department   : DIET - Nutrition and Dietetics (Level 2, Clinic C)
+       Working days : Wed, Fri
+       Diet focus: Sports nutrition | Years practising: 4
+       Primary duty : Assesses nutritional needs and prepares meal plans for patients.
+
+   (9) Nurse 5001 - Nurse Grace Okafor
+       Department   : NURS - Nursing (Ward block, Level 1)
+       Working days : Mon, Tue, Wed, Thu, Fri
+       Ward: Ward B | Blood samples collected today: 0
+       Primary duty : Provides hands-on patient care, takes observations and collects specimens.
+
+   (10) Nurse 5002 - Nurse Tom Baker
+       Department   : NURS - Nursing (Ward block, Level 1)
+       Working days : Wed, Thu, Fri
+       Ward: Ward A | Blood samples collected today: 0
+       Primary duty : Provides hands-on patient care, takes observations and collects specimens.
+
+
+------------------------------------------------------------------------
+ DEPARTMENTS - ORGANISING THE PROFESSIONALS
+------------------------------------------------------------------------
+
+ The clinic runs 5 departments:
+   - GENP - General Practice (Level 1, Clinic A)
+   - CARD - Cardiology (Level 3, Cardiac Suite)
+   - SURG - Surgery (Level 4, Theatres)
+   - DIET - Nutrition and Dietetics (Level 2, Clinic C)
+   - NURS - Nursing (Ward block, Level 1)
+
+ Professionals grouped by department:
+   GENP - General Practice (members: 3)
+       General Practitioner 1001 - Dr Anna Nguyen
+       General Practitioner 1002 - Dr Ben Carter
+       General Practitioner 1003 - Dr Priya Sharma
+   CARD - Cardiology (members: 2)
+       Cardiologist (Specialist) 2001 - Dr Helen Marsh
+       Cardiologist (Specialist) 2002 - Dr Omar Haddad
+   SURG - Surgery (members: 1)
+       Surgeon (Specialist) 3001 - Dr Lucas Reid
+   DIET - Nutrition and Dietetics (members: 2)
+       Dietitian 4001 - Ms Mei Tan
+       Dietitian 4002 - Mr Daniel Brooks
+   NURS - Nursing (members: 2)
+       Nurse 5001 - Nurse Grace Okafor
+       Nurse 5002 - Nurse Tom Baker
+   Unassigned members: 0
+
+ Registering a department:
+   WARNING : department CARD is already registered.
+   OK      : registered ONCO - Oncology.
+ The register now holds 6 departments.
+
+ One professional object is printed on its own, then the shared
+ behaviour inherited from the base class is exercised:
+   Object        : General Practitioner 1001 - Dr Anna Nguyen
+       Department   : GENP - General Practice (Level 1, Clinic A)
+       Working days : Mon, Wed, Fri
+       Consulting room: Room 3 | Accepting new patients: yes
+   ID            : 1001
+   Works Tuesday : false
+   Works Friday  : true
+
+ Each type also carries behaviour only it can perform:
+   Dr Anna Nguyen prescribed Amoxicillin (500 mg three times daily).
+   Dr Helen Marsh ordered an ECG for Ava Thompson in Cardiac Laboratory 1.
+   Dr Lucas Reid added "Knee arthroscopy" to the Theatre 2 list.
+   Ms Mei Tan planned a daily intake of 8700 kJ: breakfast, a high-fibre lunch and a light dinner.
+   Nurse Grace Okafor took a blood sample from Liam Patel (samples collected today: 1).
+   Nurse Grace Okafor took a blood sample from Ava Thompson (samples collected today: 2).
+   The nurse's own record now reads: Ward: Ward B | Blood samples collected today: 2
+
+ Invalid data is rejected before an object can exist:
+   Guarded : A health professional ID must contain digits only, but was: 10A1
+   Guarded : A health professional name is required.
+   Guarded : A patient mobile number must have 10 digits: 0412 345
+   Guarded : An appointment needs a patient.
+   Guarded : The clinic cannot open after it closes.
+   Guarded : A department name is required.
+
+------------------------------------------------------------------------
+ PART 4 - MODELLING AN APPOINTMENT
+------------------------------------------------------------------------
+
+ A newly created appointment prints as:
+   08:30  Ava Thompson (mobile 0412 345 678)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+
+ Appointments order themselves by time, so a mixed collection can be
+ sorted before the times have even been put in order:
+   Before sorting: 11:00, 08:30, 09:30
+   After sorting : 08:30 09:30 11:00
+
+
+------------------------------------------------------------------------
+ PART 5 - MANAGING THE COLLECTION OF APPOINTMENTS
+------------------------------------------------------------------------
+
+ Clinic timetable : 08:00 to 15:30 in 30 minute slots (16 slots per day)
+ Bookings are only made for the current day: 2026-11-16
+
+ Adding appointments (normal cases):
+   OK      : booked 08:30 for Ava Thompson with General Practitioner 1001 - Dr Anna Nguyen.
+   OK      : booked 09:00 for Noah Wilson with Cardiologist (Specialist) 2001 - Dr Helen Marsh.
+   OK      : booked 09:30 for Mia Chen with General Practitioner 1002 - Dr Ben Carter.
+   OK      : booked 10:00 for Liam Patel with Nurse 5001 - Nurse Grace Okafor.
+   OK      : booked 11:00 for Ava Thompson with Dietitian 4001 - Ms Mei Tan.
+   OK      : booked 13:30 for Noah Wilson with Surgeon (Specialist) 3001 - Dr Lucas Reid.
+   OK      : booked 14:00 for Liam Patel with General Practitioner 1001 - Dr Anna Nguyen.
+
+ Adding appointments (error cases):
+   WARNING : Dr Helen Marsh already has an appointment at 09:00.
+   WARNING : 10:15 is not one of the clinic's slots. The clinic runs 08:00 to 15:30 in 30 minute slots (16 slots per day).
+   WARNING : no appointment was supplied.
+
+ All appointments, sorted from earliest to latest:
+     - 08:30  Ava Thompson (mobile 0412 345 678)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     - 09:00  Noah Wilson (mobile 0423 456 789)
+          with Cardiologist (Specialist) 2001 - Dr Helen Marsh
+          Sub-specialty: Interventional cardiology | Reports from: Cardiac Laboratory 1
+     - 09:30  Mia Chen (mobile 0434 567 890)
+          with General Practitioner 1002 - Dr Ben Carter
+          Consulting room: Room 5 | Accepting new patients: no
+     - 10:00  Liam Patel (mobile 0445 678 901)
+          with Nurse 5001 - Nurse Grace Okafor
+          Ward: Ward B | Blood samples collected today: 2
+     - 11:00  Ava Thompson (mobile 0412 345 678)
+          with Dietitian 4001 - Ms Mei Tan
+          Diet focus: Type 2 diabetes and weight management | Years practising: 9
+     - 13:30  Noah Wilson (mobile 0423 456 789)
+          with Surgeon (Specialist) 3001 - Dr Lucas Reid
+          Surgical field: Orthopaedic surgery | Operating theatre: Theatre 2
+     - 14:00  Liam Patel (mobile 0445 678 901)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     Total in this list: 7
+
+
+------------------------------------------------------------------------
+ PART 6 - WORKING WITH APPOINTMENTS
+------------------------------------------------------------------------
+
+ Filtered by health professional 1001:
+     - 08:30  Ava Thompson (mobile 0412 345 678)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     - 14:00  Liam Patel (mobile 0445 678 901)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     Total in this list: 2
+
+ Filtered by health professional 2001:
+     - 09:00  Noah Wilson (mobile 0423 456 789)
+          with Cardiologist (Specialist) 2001 - Dr Helen Marsh
+          Sub-specialty: Interventional cardiology | Reports from: Cardiac Laboratory 1
+     Total in this list: 1
+
+ Filtered by patient mobile 0412 345 678:
+     - 08:30  Ava Thompson (mobile 0412 345 678)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     - 11:00  Ava Thompson (mobile 0412 345 678)
+          with Dietitian 4001 - Ms Mei Tan
+          Diet focus: Type 2 diabetes and weight management | Years practising: 9
+     Total in this list: 2
+
+ Filtered by patient mobile 0445678901:
+     - 10:00  Liam Patel (mobile 0445 678 901)
+          with Nurse 5001 - Nurse Grace Okafor
+          Ward: Ward B | Blood samples collected today: 2
+     - 14:00  Liam Patel (mobile 0445 678 901)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     Total in this list: 2
+
+ Filtered by department CARD:
+     - 09:00  Noah Wilson (mobile 0423 456 789)
+          with Cardiologist (Specialist) 2001 - Dr Helen Marsh
+          Sub-specialty: Interventional cardiology | Reports from: Cardiac Laboratory 1
+     Total in this list: 1
+
+ Filtered by department GENP:
+     - 08:30  Ava Thompson (mobile 0412 345 678)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     - 09:30  Mia Chen (mobile 0434 567 890)
+          with General Practitioner 1002 - Dr Ben Carter
+          Consulting room: Room 5 | Accepting new patients: no
+     - 14:00  Liam Patel (mobile 0445 678 901)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     Total in this list: 3
+
+ Cancelling appointments:
+   OK      : cancelled the 08:30 appointment for Ava Thompson with Dr Anna Nguyen.
+   OK      : cancelled 2 appointment(s) for patient mobile 0423 456 789.
+
+ Cancelling appointments (error cases):
+   WARNING : no appointment found for professional 3001 at 13:30.
+   WARNING : no appointment found for professional 9999 at 14:00.
+   WARNING : no appointment found for patient mobile 0499999999.
+
+ Cancelling appointments by department:
+   OK      : cancelled 1 appointment(s) for department NURS.
+   WARNING : no appointments found for department RADL.
+
+ The collection after the cancellations:
+     - 09:30  Mia Chen (mobile 0434 567 890)
+          with General Practitioner 1002 - Dr Ben Carter
+          Consulting room: Room 5 | Accepting new patients: no
+     - 11:00  Ava Thompson (mobile 0412 345 678)
+          with Dietitian 4001 - Ms Mei Tan
+          Diet focus: Type 2 diabetes and weight management | Years practising: 9
+     - 14:00  Liam Patel (mobile 0445 678 901)
+          with General Practitioner 1001 - Dr Anna Nguyen
+          Consulting room: Room 3 | Accepting new patients: yes
+     Total in this list: 3
+
+ Appointments still booked: 3 (7 were booked successfully; 1 was cancelled by professional ID and
+ time, 2 by patient mobile number, and 1 by the nursing department).
+
+========================================================================
+ End of demonstration.
+========================================================================

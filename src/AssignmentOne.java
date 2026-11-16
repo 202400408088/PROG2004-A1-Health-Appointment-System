@@ -15,7 +15,9 @@ import java.util.List;
  *
  * <p>Parts 1 and 2 of the brief live in the class design
  * ({@link HealthProfessional} and its five subclasses); this class demonstrates
- * Parts 3, 4, 5 and 6.</p>
+ * Parts 3, 4, 5 and 6. The departments extension is demonstrated after Part 3:
+ * {@link Department} groups the professionals, and the manager can filter and
+ * cancel appointments by department code.</p>
  *
  * @author Jueding Lin
  * @version 1.0
@@ -45,6 +47,26 @@ public class AssignmentOne {
         System.out.println(" handled together through the same base type.");
         System.out.println();
         printProfessionalList(professionals);
+
+        // ------------------------------------------------- departments (extension)
+        printSection("DEPARTMENTS - ORGANISING THE PROFESSIONALS");
+        // Every professional belongs to exactly one department, and the directory owns the register.
+        DepartmentDirectory departments = DepartmentDirectory.standardClinic();
+        System.out.println(" The clinic runs " + departments.size() + " departments:");
+        for (Department department : departments.getAllDepartments()) {
+            System.out.println("   - " + department);
+        }
+        System.out.println();
+        printDepartmentRoster(departments, professionals);
+
+        System.out.println(" Registering a department:");
+        // A code may only be used once, so a second registration is refused.
+        printMessage(departments.addDepartment(
+                new Department("CARD", "Cardiology", "Level 3, Cardiac Suite")));
+        printMessage(departments.addDepartment(
+                new Department("ONCO", "Oncology", "Level 5, Day Unit")));
+        System.out.println(" The register now holds " + departments.size() + " departments.");
+        System.out.println();
 
         System.out.println(" One professional object is printed on its own, then the shared");
         System.out.println(" behaviour inherited from the base class is exercised:");
@@ -172,6 +194,12 @@ public class AssignmentOne {
         printAppointments("Filtered by patient mobile 0445678901:",
                 manager.findByPatientPhone("0445678901"));
         System.out.println();
+        printAppointments("Filtered by department CARD:",
+                manager.findByDepartment("CARD"));
+        System.out.println();
+        printAppointments("Filtered by department GENP:",
+                manager.findByDepartment("GENP"));
+        System.out.println();
 
         System.out.println(" Cancelling appointments:");
         // Cancel one booking by naming the professional and the time.
@@ -186,11 +214,18 @@ public class AssignmentOne {
         printMessage(manager.cancelByPatientPhone("0499999999"));
         System.out.println();
 
+        System.out.println(" Cancelling appointments by department:");
+        // Closing one department removes every booking made with its professionals.
+        printMessage(manager.cancelByDepartment("NURS"));
+        // An unknown department code is reported, not ignored.
+        printMessage(manager.cancelByDepartment("RADL"));
+        System.out.println();
+
         printAppointments("The collection after the cancellations:", manager.getAllAppointments());
         System.out.println();
         System.out.println(" Appointments still booked: " + manager.getAppointmentCount()
-                + " (7 were booked successfully, 1 was cancelled individually and");
-        System.out.println(" 2 were cancelled by patient mobile number).");
+                + " (7 were booked successfully; 1 was cancelled by professional ID and");
+        System.out.println(" time, 2 by patient mobile number, and 1 by the nursing department).");
 
         System.out.println();
         System.out.println(TITLE_LINE);
@@ -249,6 +284,32 @@ public class AssignmentOne {
     }
 
     /**
+     * Prints the professionals grouped by department, so the roster shows how
+     * the staff are organised rather than only who exists.
+     *
+     * @param directory     the department register
+     * @param professionals the professionals to group
+     */
+    private static void printDepartmentRoster(DepartmentDirectory directory,
+                                              List<HealthProfessional> professionals) {
+        System.out.println(" Professionals grouped by department:");
+        for (Department department : directory.getAllDepartments()) {
+            // The directory decides which professionals belong to this department.
+            List<HealthProfessional> members =
+                    directory.findProfessionalsByDepartment(department.getCode(), professionals);
+            System.out.println("   " + department.getCode() + " - " + department.getName()
+                    + " (members: " + members.size() + ")");
+            for (HealthProfessional member : members) {
+                System.out.println("       " + member.getProfessionalType() + " "
+                        + member.getId() + " - " + member.getName());
+            }
+        }
+        // A professional created without a department is reported rather than hidden.
+        System.out.println("   Unassigned members: " + directory.countUnassigned(professionals));
+        System.out.println();
+    }
+
+    /**
      * Prints a labelled list of appointments.
      *
      * @param label        the description of what the list contains
@@ -289,7 +350,7 @@ public class AssignmentOne {
                 "Interventional cardiology", "Cardiac Laboratory 1"));
         professionals.add(new Cardiologist("2002", "Dr Omar Haddad",
                 days(DayOfWeek.TUESDAY, DayOfWeek.FRIDAY),
-                "Electrophysiology", "Cardiac Laboratory 2"));
+                "Electrophysiology", "Cardiac Laboratory 2", Department.cardiology()));
 
         professionals.add(new Surgeon("3001", "Dr Lucas Reid",
                 days(DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY),
@@ -344,6 +405,12 @@ public class AssignmentOne {
         try {
             // 5. A timetable that opens after it closes is rejected.
             new ClinicSchedule(LocalTime.of(17, 0), LocalTime.of(9, 0), 30);
+        } catch (IllegalArgumentException exception) {
+            System.out.println("   Guarded : " + exception.getMessage());
+        }
+        try {
+            // 6. A department with a blank name is rejected.
+            new Department("ONCO", "   ");
         } catch (IllegalArgumentException exception) {
             System.out.println("   Guarded : " + exception.getMessage());
         }
