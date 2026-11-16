@@ -6,8 +6,6 @@ professionals, books appointments, filters, sorts, cancels and reports the error
 
 **Author:** Jueding Lin
 
-> Rename the project folder and the zip to `A1-<your MySCU username>` before submitting.
-
 ---
 
 ## 1. How to run
@@ -15,14 +13,14 @@ professionals, books appointments, filters, sorts, cancels and reports the error
 ### From a terminal
 
 ```bash
-cd A1-username
+cd A1-JudingLin_25259052
 javac -d out src/*.java
 java -cp out AssignmentOne
 ```
 
 ### From IntelliJ IDEA / Eclipse
 
-1. Open the `A1-username` folder as a project (it is a plain Java project; `src` is the source root).
+1. Open the `A1-JudingLin_25259052` folder as a project (it is a plain Java project; `src` is the source root).
 2. Set the project SDK to Java 11 or newer.
 3. Run the `AssignmentOne` class.
 
