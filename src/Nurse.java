@@ -17,7 +17,7 @@ public class Nurse extends HealthProfessional {
     private int bloodSamplesCollected;
 
     /**
-     * Creates a nurse.
+     * Creates a nurse in the clinic's nursing department.
      *
      * @param id            identifier made of digits only
      * @param name          the nurse's name
@@ -26,8 +26,24 @@ public class Nurse extends HealthProfessional {
      * @throws IllegalArgumentException if any argument is invalid
      */
     public Nurse(String id, String name, List<DayOfWeek> availableDays, String ward) {
+        // Delegate with the department that suits this type of professional.
+        this(id, name, availableDays, ward, Department.nursing());
+    }
+
+    /**
+     * Creates a nurse who works in a supplied department.
+     *
+     * @param id            identifier made of digits only
+     * @param name          the nurse's name
+     * @param availableDays the days the nurse works
+     * @param ward          the ward the nurse is based on
+     * @param department    the department the nurse belongs to
+     * @throws IllegalArgumentException if any argument is invalid
+     */
+    public Nurse(String id, String name, List<DayOfWeek> availableDays, String ward,
+                 Department department) {
         // The base class stores and validates the shared fields.
-        super(id, name, availableDays);
+        super(id, name, availableDays, department);
         if (ward == null || ward.trim().isEmpty()) {
             throw new IllegalArgumentException("A ward is required for a nurse.");
         }

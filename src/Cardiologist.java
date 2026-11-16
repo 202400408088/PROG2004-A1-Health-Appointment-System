@@ -17,7 +17,7 @@ public class Cardiologist extends HealthProfessional {
     private final String reportingLab;
 
     /**
-     * Creates a cardiologist.
+     * Creates a cardiologist in the clinic's cardiology department.
      *
      * @param id            identifier made of digits only
      * @param name          the specialist's name
@@ -28,8 +28,25 @@ public class Cardiologist extends HealthProfessional {
      */
     public Cardiologist(String id, String name, List<DayOfWeek> availableDays,
                         String subSpecialty, String reportingLab) {
+        // Delegate with the department that suits this type of professional.
+        this(id, name, availableDays, subSpecialty, reportingLab, Department.cardiology());
+    }
+
+    /**
+     * Creates a cardiologist who works in a supplied department.
+     *
+     * @param id            identifier made of digits only
+     * @param name          the specialist's name
+     * @param availableDays the days the specialist works
+     * @param subSpecialty  the area of cardiology the specialist focuses on
+     * @param reportingLab  the laboratory the specialist reports from
+     * @param department    the department the specialist belongs to
+     * @throws IllegalArgumentException if any argument is invalid
+     */
+    public Cardiologist(String id, String name, List<DayOfWeek> availableDays,
+                        String subSpecialty, String reportingLab, Department department) {
         // The base class stores and validates the shared fields.
-        super(id, name, availableDays);
+        super(id, name, availableDays, department);
         this.subSpecialty = requireText(subSpecialty, "A cardiology sub-specialty is required.");
         this.reportingLab = requireText(reportingLab, "A reporting laboratory is required.");
     }

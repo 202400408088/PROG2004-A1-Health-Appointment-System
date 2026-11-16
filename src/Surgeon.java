@@ -17,7 +17,7 @@ public class Surgeon extends HealthProfessional {
     private final String theatre;
 
     /**
-     * Creates a surgeon.
+     * Creates a surgeon in the clinic's surgical department.
      *
      * @param id            identifier made of digits only
      * @param name          the surgeon's name
@@ -28,8 +28,25 @@ public class Surgeon extends HealthProfessional {
      */
     public Surgeon(String id, String name, List<DayOfWeek> availableDays,
                    String surgicalField, String theatre) {
+        // Delegate with the department that suits this type of professional.
+        this(id, name, availableDays, surgicalField, theatre, Department.surgery());
+    }
+
+    /**
+     * Creates a surgeon who works in a supplied department.
+     *
+     * @param id            identifier made of digits only
+     * @param name          the surgeon's name
+     * @param availableDays the days the surgeon operates
+     * @param surgicalField the field of surgery the surgeon specialises in
+     * @param theatre       the operating theatre the surgeon works in
+     * @param department    the department the surgeon belongs to
+     * @throws IllegalArgumentException if any argument is invalid
+     */
+    public Surgeon(String id, String name, List<DayOfWeek> availableDays,
+                   String surgicalField, String theatre, Department department) {
         // The base class stores and validates the shared fields.
-        super(id, name, availableDays);
+        super(id, name, availableDays, department);
         this.surgicalField = requireText(surgicalField, "A surgical field is required.");
         this.theatre = requireText(theatre, "An operating theatre is required.");
     }

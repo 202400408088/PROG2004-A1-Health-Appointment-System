@@ -8,9 +8,10 @@ import java.util.Locale;
  * Common base class for every health professional the clinic employs.
  *
  * <p>The class stores only the information that every professional shares, no
- * matter what their specialty is: a numeric identifier, a name, and the fixed
- * set of days they work each week. The specialised types in Part 2 extend this
- * class instead of repeating these fields.</p>
+ * matter what their specialty is: a numeric identifier, a name, the fixed set
+ * of days they work each week, and the department they belong to. The
+ * specialised types in Part 2 extend this class instead of repeating these
+ * fields.</p>
  *
  * <p>The class is abstract because a "plain" health professional with no
  * specialty has no meaning in this system. Declaring it abstract stops
@@ -28,9 +29,11 @@ public abstract class HealthProfessional {
     private final String id;
     private final String name;
     private final List<DayOfWeek> availableDays;
+    private final Department department;
 
     /**
-     * Creates a health professional with an explicitly supplied working pattern.
+     * Creates a health professional with an explicitly supplied working pattern
+     * and no department recorded yet.
      *
      * @param id            identifier made of digits only
      * @param name          the professional's name
@@ -38,10 +41,33 @@ public abstract class HealthProfessional {
      * @throws IllegalArgumentException if any argument is missing or invalid
      */
     public HealthProfessional(String id, String name, List<DayOfWeek> availableDays) {
+        // Delegate so there is one place that stores and validates the shared fields.
+        this(id, name, availableDays, null);
+    }
+
+    /**
+     * Creates a health professional in a department.
+     *
+     * <p>The department is deliberately allowed to be {@code null}, because a
+     * professional can be on the books before being placed in a department.
+     * {@link #getDepartmentText()} prints that case as "Unassigned" rather than
+     * failing, and every concrete subclass supplies its own department by
+     * default.</p>
+     *
+     * @param id            identifier made of digits only
+     * @param name          the professional's name
+     * @param availableDays the days of the week the professional works
+     * @param department    the department the professional belongs to, or {@code null}
+     * @throws IllegalArgumentException if the identifier, name or days are invalid
+     */
+    public HealthProfessional(String id, String name, List<DayOfWeek> availableDays,
+                              Department department) {
         // Every field is validated before it is stored, so a broken object cannot exist.
         this.id = validateId(id);
         this.name = validateName(name);
         this.availableDays = copyDays(availableDays);
+        // A department object validates its own code and name, so no check is repeated here.
+        this.department = department;
     }
 
     /**
@@ -193,6 +219,28 @@ public abstract class HealthProfessional {
     }
 
     /**
+     * @return the department the professional belongs to, or {@code null} when
+     *         none has been recorded
+     */
+    public Department getDepartment() {
+        return department;
+    }
+
+    /**
+     * @return the department code, or "Unassigned" when no department is recorded
+     */
+    public String getDepartmentCode() {
+        return department == null ? "None" : department.getCode();
+    }
+
+    /**
+     * @return the department in a readable form, or "Unassigned" when none is recorded
+     */
+    public String getDepartmentText() {
+        return department == null ? "Unassigned" : department.toString();
+    }
+
+    /**
      * Every subclass must state the kind of professional it represents so the
      * type can always be printed clearly.
      *
@@ -221,6 +269,10 @@ public abstract class HealthProfessional {
      * Two professionals are the same professional when they carry the same
      * identifier. This is what lets the appointment manager recognise a
      * double booking, even when two different objects describe the same person.
+     *
+     * <p>The department is deliberately left out of this comparison: moving a
+     * doctor to another department does not turn them into a different person,
+     * and an appointment booked before the move must still be found afterwards.</p>
      *
      * @param other the object to compare with
      * @return {@code true} if both objects describe the same identifier
@@ -259,9 +311,11 @@ public abstract class HealthProfessional {
         // First line: the type, the identifier and the name.
         text.append(getProfessionalType()).append(" ").append(id).append(" - ").append(name)
                 .append(System.lineSeparator());
-        // Second line: the shared data every professional inherits.
+        // Second line: the department the professional belongs to.
+        text.append("       Department   : ").append(getDepartmentText()).append(System.lineSeparator());
+        // Third line: the shared data every professional inherits.
         text.append("       Working days : ").append(getAvailableDaysText()).append(System.lineSeparator());
-        // Third line: the detail each subclass contributes for itself.
+        // Fourth line: the detail each subclass contributes for itself.
         text.append("       ").append(getTypeSpecificDetails());
         return text.toString();
     }

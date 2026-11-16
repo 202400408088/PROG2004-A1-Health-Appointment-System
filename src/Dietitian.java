@@ -17,7 +17,7 @@ public class Dietitian extends HealthProfessional {
     private final int yearsPractising;
 
     /**
-     * Creates a dietitian.
+     * Creates a dietitian in the clinic's nutrition and dietetics department.
      *
      * @param id              identifier made of digits only
      * @param name            the dietitian's name
@@ -28,8 +28,25 @@ public class Dietitian extends HealthProfessional {
      */
     public Dietitian(String id, String name, List<DayOfWeek> availableDays,
                      String dietFocus, int yearsPractising) {
+        // Delegate with the department that suits this type of professional.
+        this(id, name, availableDays, dietFocus, yearsPractising, Department.dietetics());
+    }
+
+    /**
+     * Creates a dietitian who works in a supplied department.
+     *
+     * @param id              identifier made of digits only
+     * @param name            the dietitian's name
+     * @param availableDays   the days the dietitian works
+     * @param dietFocus       the area of dietetics the dietitian focuses on
+     * @param yearsPractising the number of years the dietitian has practised
+     * @param department      the department the dietitian belongs to
+     * @throws IllegalArgumentException if any argument is invalid
+     */
+    public Dietitian(String id, String name, List<DayOfWeek> availableDays,
+                     String dietFocus, int yearsPractising, Department department) {
         // The base class stores and validates the shared fields.
-        super(id, name, availableDays);
+        super(id, name, availableDays, department);
         // Both extra fields are checked before anything is assigned.
         if (dietFocus == null || dietFocus.trim().isEmpty()) {
             throw new IllegalArgumentException("A diet focus is required for a dietitian.");

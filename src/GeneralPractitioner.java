@@ -18,7 +18,8 @@ public class GeneralPractitioner extends HealthProfessional {
     private final boolean acceptingNewPatients;
 
     /**
-     * Creates a general practitioner with an explicitly supplied working pattern.
+     * Creates a general practitioner with an explicitly supplied working pattern,
+     * placed in the clinic's general practice department.
      *
      * @param id                  identifier made of digits only
      * @param name                the doctor's name
@@ -29,8 +30,27 @@ public class GeneralPractitioner extends HealthProfessional {
      */
     public GeneralPractitioner(String id, String name, List<DayOfWeek> availableDays,
                                String consultingRoom, boolean acceptingNewPatients) {
+        // Delegate with the department that suits this type of professional.
+        this(id, name, availableDays, consultingRoom, acceptingNewPatients,
+                Department.generalPractice());
+    }
+
+    /**
+     * Creates a general practitioner who works in a supplied department.
+     *
+     * @param id                  identifier made of digits only
+     * @param name                the doctor's name
+     * @param availableDays       the days the doctor works
+     * @param consultingRoom      the room the doctor consults from
+     * @param acceptingNewPatients whether the doctor is taking new patients
+     * @param department          the department the doctor belongs to
+     * @throws IllegalArgumentException if any argument is invalid
+     */
+    public GeneralPractitioner(String id, String name, List<DayOfWeek> availableDays,
+                               String consultingRoom, boolean acceptingNewPatients,
+                               Department department) {
         // Hand the shared data to the base class, which owns the shared validation.
-        super(id, name, availableDays);
+        super(id, name, availableDays, department);
         this.consultingRoom = validateConsultingRoom(consultingRoom);
         this.acceptingNewPatients = acceptingNewPatients;
     }
