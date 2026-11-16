@@ -7,7 +7,9 @@ import java.util.List;
 
 /**
  * Keeps every appointment the clinic has booked and offers the operations the
- * clinic needs: add, view, filter, sort and cancel.
+ * clinic needs: add, view, filter, sort and cancel. Appointments can be filtered
+ * by professional, by patient phone number, or by the department the chosen
+ * professional belongs to, and a whole department can be cancelled in one call.
  *
  * <p>Appointments are held in an {@link ArrayList} because the collection grows
  * as bookings arrive, is read as a whole when staff view or sort the day, and
@@ -145,6 +147,30 @@ public class AppointmentManager {
     }
 
     /**
+     * Finds the appointments booked in one department. A professional with no
+     * department recorded never matches a department code.
+     *
+     * @param departmentCode the department code to filter on
+     * @return the matching appointments in time order
+     */
+    public List<Appointment> findByDepartment(String departmentCode) {
+        List<Appointment> matches = new ArrayList<>();
+        if (departmentCode == null || departmentCode.trim().isEmpty()) {
+            return matches;
+        }
+        // The department code decides which appointments belong to the filter.
+        String wantedCode = departmentCode.trim().toUpperCase(java.util.Locale.ENGLISH);
+        for (Appointment appointment : appointments) {
+            Department department = appointment.getProfessional().getDepartment();
+            // Only a professional whose department matches is kept.
+            if (department != null && department.getCode().equals(wantedCode)) {
+                matches.add(appointment);
+            }
+        }
+        return sortedCopy(matches);
+    }
+
+    /**
      * Cancels the appointment a professional holds at a given time.
      *
      * @param professionalId the professional's identifier
@@ -199,6 +225,37 @@ public class AppointmentManager {
         }
         return OK + "cancelled " + cancelled + " appointment(s) for patient mobile "
                 + mobileNumber.trim() + ".";
+    }
+
+    /**
+     * Cancels every appointment booked in one department, for example when a
+     * department closes for the afternoon.
+     *
+     * @param departmentCode the department code to cancel by
+     * @return a message describing the outcome
+     */
+    public String cancelByDepartment(String departmentCode) {
+        if (departmentCode == null || departmentCode.trim().isEmpty()) {
+            return WARNING + "a department code is required to cancel appointments for a department.";
+        }
+        // The stored codes are already upper case, so the comparison is too.
+        String wantedCode = departmentCode.trim().toUpperCase(java.util.Locale.ENGLISH);
+        int cancelled = 0;
+        // The same removal pattern used for the mobile number filter.
+        for (Iterator<Appointment> iterator = appointments.iterator(); iterator.hasNext(); ) {
+            Appointment appointment = iterator.next();
+            Department department = appointment.getProfessional().getDepartment();
+            if (department != null && department.getCode().equals(wantedCode)) {
+                // Every appointment in the department is removed and counted.
+                iterator.remove();
+                cancelled++;
+            }
+        }
+        // Nothing matched, so the caller is told instead of being given a false success.
+        if (cancelled == 0) {
+            return WARNING + "no appointments found for department " + wantedCode + ".";
+        }
+        return OK + "cancelled " + cancelled + " appointment(s) for department " + wantedCode + ".";
     }
 
     /**
